@@ -19,9 +19,6 @@ SUPPORTED = {
     "cosine": "cosine",          # distance = 1 - cosine_similarity
     "euclidean": "euclidean",    # L2
     "manhattan": "cityblock",    # L1
-    "cityblock": "cityblock",    # alias
-    "chebyshev": "chebyshev",
-    "braycurtis": "braycurtis",
 }
 
 DEFAULT_EMBEDDINGS_PATH = "../data/embeddings/embeddings_mobilenet_v2.npy"
