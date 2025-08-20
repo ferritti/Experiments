@@ -105,14 +105,14 @@ def evaluate_ratio_test(
     nn_labels: Sequence[str],
     d1: np.ndarray,
     d2: np.ndarray,
-    taus: np.ndarray,
+    ratios: np.ndarray,
 ) -> Dict[float, Dict[str, float]]:
     results: Dict[float, Dict[str, float]] = {}
     y_true = list(y_true)
     nn_labels = list(nn_labels)
     total = len(y_true)
-    for tau in taus:
-        accepted = d1 / (d2 + 1e-12) < float(tau)
+    for ratio in ratios:
+        accepted = d1 / (d2 + 1e-12) < float(ratio)
         # Build predictions with possible no-match
         y_pred: List[str] = [
             (lbl if acc else "__no_match__") for acc, lbl in zip(accepted, nn_labels)
@@ -124,7 +124,7 @@ def evaluate_ratio_test(
         f1 = 2 * precision * recall / (precision + recall + 1e-12)
         accuracy = sum(1 for i in range(total) if y_pred[i] == y_true[i]) / (total + 1e-12)
         coverage = len(matches_idx) / (total + 1e-12)
-        results[float(tau)] = {
+        results[float(ratio)] = {
             "precision": precision,
             "recall": recall,
             "f1": f1,
@@ -134,7 +134,7 @@ def evaluate_ratio_test(
     return results
 
 
-def plot_curve(taus: Sequence[float], results: Dict[float, Dict[str, float]], out_png: str, title: str) -> None:
+def plot_curve(ratios: Sequence[float], results: Dict[float, Dict[str, float]], out_png: str, title: str) -> None:
     order = sorted(results.keys())
     f1 = [results[t]["f1"] for t in order]
     prec = [results[t]["precision"] for t in order]
@@ -146,7 +146,7 @@ def plot_curve(taus: Sequence[float], results: Dict[float, Dict[str, float]], ou
     plt.plot(order, prec, label="Precision")
     plt.plot(order, rec, label="Recall")
     plt.plot(order, cov, label="Coverage")
-    plt.xlabel("tau (d1/d2)")
+    plt.xlabel("ratio (d1/d2)")
     plt.ylabel("score")
     plt.title(title)
     plt.grid(True, alpha=0.3)
@@ -158,11 +158,11 @@ def plot_curve(taus: Sequence[float], results: Dict[float, Dict[str, float]], ou
 
 
 def save_results_csv(results: Dict[float, Dict[str, float]], out_csv: str) -> None:
-    """Save per-metric results to CSV with columns: tau, precision, recall, f1, accuracy, coverage."""
+    """Save per-metric results to CSV with columns: ratio, precision, recall, f1, accuracy, coverage."""
     os.makedirs(os.path.dirname(os.path.abspath(out_csv)), exist_ok=True)
     order = sorted(results.keys())
     with open(out_csv, "w", encoding="utf-8") as f:
-        f.write("tau,precision,recall,f1,accuracy,coverage\n")
+        f.write("ratio,precision,recall,f1,accuracy,coverage\n")
         for t in order:
             m = results[t]
             f.write(
@@ -176,7 +176,7 @@ def run_metric(
     labels: Sequence[str],
     metric_key: str,
     normalize: bool,
-    taus: np.ndarray,
+    ratios: np.ndarray,
 ) -> Tuple[Dict[float, Dict[str, float]], Dict[str, float]]:
     splits = loo_splits(len(paths))
 
@@ -209,10 +209,10 @@ def run_metric(
     all_d1_arr = np.concatenate(all_d1, axis=0)
     all_d2_arr = np.concatenate(all_d2, axis=0)
 
-    results = evaluate_ratio_test(all_true, all_nn_labels, all_d1_arr, all_d2_arr, taus)
+    results = evaluate_ratio_test(all_true, all_nn_labels, all_d1_arr, all_d2_arr, ratios)
     # Best by F1
-    best_tau, best_metrics = max(results.items(), key=lambda kv: kv[1]["f1"])  # type: ignore[index]
-    best = {**best_metrics, "best_tau": float(best_tau)}
+    best_ratio, best_metrics = max(results.items(), key=lambda kv: kv[1]["f1"])  # type: ignore[index]
+    best = {**best_metrics, "best_ratio": float(best_ratio)}
     return results, best
 
 
@@ -222,9 +222,14 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
     p.add_argument("--label_mode", choices=["dirname", "filename_prefix"], default="dirname", help="Come derivare le etichette dai path")
     p.add_argument("--metrics", default="cosine,euclidean,manhattan", help="Metriche da testare separate da virgola")
     p.add_argument("--normalize", action="store_true", help="Applica L2-normalizzazione ai vettori prima della distanza")
-    p.add_argument("--tau_min", type=float, default=0.6)
-    p.add_argument("--tau_max", type=float, default=0.95)
-    p.add_argument("--tau_steps", type=int, default=20)
+    # Preferred 'ratio' arguments
+    p.add_argument("--ratio_min", type=float, default=None, help="Soglia minima per il ratio d1/d2 (default: 0.6)")
+    p.add_argument("--ratio_max", type=float, default=None, help="Soglia massima per il ratio d1/d2 (default: 0.95)")
+    p.add_argument("--ratio_steps", type=int, default=None, help="Numero di passi per il ratio (default: 20)")
+    # Deprecated tau arguments for backward compatibility
+    p.add_argument("--tau_min", type=float, default=0.6, help="[DEPRECATO] Usa --ratio_min")
+    p.add_argument("--tau_max", type=float, default=0.95, help="[DEPRECATO] Usa --ratio_max")
+    p.add_argument("--tau_steps", type=int, default=20, help="[DEPRECATO] Usa --ratio_steps")
     p.add_argument("--out_dir", default="../experiments_out", help="Cartella di output: verranno create le sottocartelle 'plots/' (grafici) e 'csv_files/' (CSV)")
     return p.parse_args(argv)
 
@@ -244,7 +249,11 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     labels = derive_labels(paths, mode=args.label_mode)
 
-    taus = np.linspace(float(args.tau_min), float(args.tau_max), int(args.tau_steps), dtype=np.float32)
+    # Determine ratio grid (prefer new --ratio_* if provided)
+    ratio_min = args.ratio_min if args.ratio_min is not None else args.tau_min
+    ratio_max = args.ratio_max if args.ratio_max is not None else args.tau_max
+    ratio_steps = args.ratio_steps if args.ratio_steps is not None else args.tau_steps
+    ratios = np.linspace(float(ratio_min), float(ratio_max), int(ratio_steps), dtype=np.float32)
 
     metrics = [m.strip().lower() for m in (args.metrics or "").split(",") if m.strip()]
     if not metrics:
@@ -265,11 +274,11 @@ def main(argv: Sequence[str] | None = None) -> int:
             print(f"[WARN] metrica '{m}' non supportata, salto.", file=sys.stderr)
             continue
         print(f"[INFO] Eseguo metrica={m} | normalize={args.normalize}")
-        results, best = run_metric(X, paths, labels, metric_key=m, normalize=bool(args.normalize), taus=taus)
+        results, best = run_metric(X, paths, labels, metric_key=m, normalize=bool(args.normalize), ratios=ratios)
 
         # Salva curva
         plot_path = os.path.join(plots_dir, f"curve_{m}.png")
-        plot_curve(taus, results, plot_path, title=f"Ratio test curve - {m}")
+        plot_curve(ratios, results, plot_path, title=f"Ratio test curve - {m}")
         print(f"[OK] Salvato grafico: {plot_path}")
 
         # Salva CSV risultati completi per metrica
@@ -278,28 +287,28 @@ def main(argv: Sequence[str] | None = None) -> int:
         print(f"[OK] Salvato CSV risultati: {results_csv}")
 
         print(
-            f"[BEST] metric={m} best_tau={best['best_tau']:.3f} F1={best['f1']:.3f} "
+            f"[BEST] metric={m} best_ratio={best['best_ratio']:.3f} F1={best['f1']:.3f} "
             f"P={best['precision']:.3f} R={best['recall']:.3f} Acc={best['accuracy']:.3f} Cov={best['coverage']:.3f}"
         )
-        summary.append((m, float(best["best_tau"]), best))
+        summary.append((m, float(best["best_ratio"]), best))
 
     # Salva riepilogo migliori per metrica
     if summary:
         best_csv = os.path.join(csv_dir, "best_summary.csv")
         with open(best_csv, "w", encoding="utf-8") as f:
-            f.write("metric,best_tau,precision,recall,f1,accuracy,coverage\n")
-            for m, tau, metr in summary:
+            f.write("metric,best_ratio,precision,recall,f1,accuracy,coverage\n")
+            for m, ratio, metr in summary:
                 f.write(
-                    f"{m},{tau:.6f},{metr['precision']:.6f},{metr['recall']:.6f},{metr['f1']:.6f},{metr['accuracy']:.6f},{metr['coverage']:.6f}\n"
+                    f"{m},{ratio:.6f},{metr['precision']:.6f},{metr['recall']:.6f},{metr['f1']:.6f},{metr['accuracy']:.6f},{metr['coverage']:.6f}\n"
                 )
         print(f"[OK] Salvato best_summary: {best_csv}")
 
     print("\n=== RIEPILOGO ===")
     if summary:
         best_global = max(summary, key=lambda t: t[2]["f1"])  # type: ignore[index]
-        m, tau, metr = best_global
+        m, ratio, metr = best_global
         print(
-            f"Metrica migliore: {m} | tau={tau:.3f} | F1={metr['f1']:.3f} "
+            f"Metrica migliore: {m} | ratio={ratio:.3f} | F1={metr['f1']:.3f} "
             f"P={metr['precision']:.3f} R={metr['recall']:.3f} Acc={metr['accuracy']:.3f} Cov={metr['coverage']:.3f}"
         )
     else:

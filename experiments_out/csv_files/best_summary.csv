@@ -1,4 +1,4 @@
-metric,best_tau,precision,recall,f1,accuracy,coverage
+metric,best_ratio,precision,recall,f1,accuracy,coverage
 cosine,0.950000,0.968750,0.574074,0.720930,0.574074,0.592593
 euclidean,0.950000,0.960000,0.444444,0.607595,0.444444,0.462963
 manhattan,0.950000,0.892857,0.462963,0.609756,0.462963,0.518519
