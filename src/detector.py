@@ -22,6 +22,60 @@ DEFAULT_MARGIN: float = 0.0
 DEFAULT_SAVE_ALL: bool = False
 DEFAULT_RECURSIVE: bool = True
 
+
+def _create_detector(model_path: str, score_threshold: float) -> mp_vision.ObjectDetector:
+    """Crea un ObjectDetector MediaPipe con fallback e messaggi diagnostici.
+
+    - Primo tentativo: create_from_options(BaseOptions + ObjectDetectorOptions).
+    - In caso di eccezioni compatibili con il noto errore TaskRunner/create():
+      fornisce indicazioni su come risolvere a livello di ambiente e tenta un fallback
+      con create_from_model_path(model_path).
+    """
+    try:
+        base_options = mp_python.BaseOptions(model_asset_path=model_path)
+        options = mp_vision.ObjectDetectorOptions(
+            base_options=base_options,
+            score_threshold=float(score_threshold),
+            max_results=25,
+        )
+        return mp_vision.ObjectDetector.create_from_options(options)
+    except Exception as e:
+        msg = str(e)
+        likely_taskrunner_issue = any(
+            s in msg for s in [
+                "create(): incompatible function arguments",
+                "TaskRunner",
+                "CalculatorGraphConfig",
+                "input_stream: \"IMAGE:image_in\"",
+                "node {",
+            ]
+        )
+        if likely_taskrunner_issue:
+            print(
+                "[ATTENZIONE] MediaPipe ha sollevato un errore durante la creazione del detector (probabile mismatch di mediapipe/protobuf o esecuzione di un grafo testuale).\n"
+                "Dettagli: " + msg + "\n"
+                "Prova a riparare l'ambiente con:\n"
+                "  pip install --upgrade --force-reinstall mediapipe==0.10.21 protobuf==4.25.8\n"
+                "Assicurati anche di eseguire lo script dalla radice del progetto ed evitare copie/modifiche che usano TaskRunner/proto-text.",
+                file=sys.stderr,
+            )
+            # Fallback più semplice disponibile nella Tasks API
+            try:
+                return mp_vision.ObjectDetector.create_from_model_path(model_path)
+            except Exception as e2:
+                raise RuntimeError(
+                    "Impossibile creare ObjectDetector anche con il fallback.\n"
+                    f"Errore originale: {msg}\n"
+                    f"Errore fallback: {e2}\n"
+                    "Suggerimenti: re-installa mediapipe==0.10.21 e protobuf==4.25.8, poi riprova."
+                ) from e2
+        # Se non è il caso noto, riprova comunque con il fallback semplice
+        try:
+            return mp_vision.ObjectDetector.create_from_model_path(model_path)
+        except Exception:
+            # Rilancia l'eccezione originale per mantenere il contesto
+            raise
+
 @dataclass
 class DetectionCrop:
     index: int
@@ -78,14 +132,8 @@ def detect_artwork(
     if not os.path.isfile(model_path):
         raise FileNotFoundError(f"Modello non trovato: {model_path}")
 
-    # Prepara MediaPipe ObjectDetector
-    base_options = mp_python.BaseOptions(model_asset_path=model_path)
-    options = mp_vision.ObjectDetectorOptions(
-        base_options=base_options,
-        score_threshold=float(score_threshold),
-        max_results=25,
-    )
-    detector = mp_vision.ObjectDetector.create_from_options(options)
+    # Prepara MediaPipe ObjectDetector (con fallback e diagnostica)
+    detector = _create_detector(model_path=model_path, score_threshold=score_threshold)
 
     mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb)
     result = detector.detect(mp_image)

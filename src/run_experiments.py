@@ -18,7 +18,6 @@ import matplotlib.pyplot as plt  # noqa: E402
 SUPPORTED = {
     "cosine": "cosine",          # distance = 1 - cosine_similarity
     "euclidean": "euclidean",    # L2
-    "manhattan": "cityblock",    # L1
 }
 
 DEFAULT_EMBEDDINGS_PATH = "../data/embeddings/embeddings_mobilenet_v2.npy"
@@ -138,11 +137,24 @@ def plot_curve(ratios: Sequence[float], results: Dict[float, Dict[str, float]], 
     rec = [results[t]["recall"] for t in order]
     cov = [results[t]["coverage"] for t in order]
 
+    # Individua il best_ratio (massimo F1)
+    best_idx = int(np.argmax(f1)) if len(f1) > 0 else None
+    best_tau = order[best_idx] if best_idx is not None else None
+    best_f1 = f1[best_idx] if best_idx is not None else None
+
     plt.figure(figsize=(7, 4))
-    plt.plot(order, f1, label="F1")
+    # Plot F1 curve without per-point markers; only the best point will be shown as a dot.
+    plt.plot(order, f1, label="F1", linewidth=1.5)
+    # Other curves without markers to reduce clutter
     plt.plot(order, prec, label="Precision")
     plt.plot(order, rec, label="Recall")
     plt.plot(order, cov, label="Coverage")
+
+    # Highlight and annotate only the best ratio (max F1)
+    if best_tau is not None and best_f1 is not None:
+        plt.scatter([best_tau], [best_f1], color="red", zorder=6)
+        plt.annotate(f"{best_f1:.2f}", (best_tau, best_f1), textcoords="offset points", xytext=(0, 8), ha="center", fontsize=8, color="red")
+
     plt.xlabel("ratio (d1/d2)")
     plt.ylabel("score")
     plt.title(title)
@@ -155,7 +167,7 @@ def plot_curve(ratios: Sequence[float], results: Dict[float, Dict[str, float]], 
 
 
 def save_results_csv(results: Dict[float, Dict[str, float]], out_csv: str) -> None:
-    """Save per-metric results to CSV with columns: ratio, precision, recall, f1, accuracy, coverage."""
+    """[DEPRECATO] Era usato per il ratio test. Lasciato per retrocompatibilità."""
     os.makedirs(os.path.dirname(os.path.abspath(out_csv)), exist_ok=True)
     order = sorted(results.keys())
     with open(out_csv, "w", encoding="utf-8") as f:
@@ -167,66 +179,141 @@ def save_results_csv(results: Dict[float, Dict[str, float]], out_csv: str) -> No
             )
 
 
+def plot_metrics_bar(metric_names: Sequence[str], scores: Sequence[float], out_png: str, title: str) -> None:
+    plt.figure(figsize=(7, 4))
+    x = np.arange(len(metric_names))
+    plt.bar(x, scores, color="#69b3a2")
+    plt.xticks(x, metric_names)
+    plt.ylim(0.0, 1.0)
+    for xi, s in zip(x, scores):
+        plt.text(xi, s + 0.01, f"{s:.3f}", ha="center", va="bottom", fontsize=9)
+    plt.ylabel("accuracy")
+    plt.title(title)
+    plt.grid(axis="y", alpha=0.3)
+    plt.tight_layout()
+    os.makedirs(os.path.dirname(os.path.abspath(out_png)), exist_ok=True)
+    plt.savefig(out_png)
+    plt.close()
+
+
+def save_metrics_summary_csv(summary: Dict[str, float], out_csv: str) -> None:
+    os.makedirs(os.path.dirname(os.path.abspath(out_csv)), exist_ok=True)
+    with open(out_csv, "w", encoding="utf-8") as f:
+        f.write("metric,accuracy\n")
+        for m in summary:
+            f.write(f"{m},{summary[m]:.6f}\n")
+
+
 def run_metric(
     X: np.ndarray,
     paths: Sequence[str],
     labels: Sequence[str],
     metric_key: str,
     normalize: bool,
-    ratios: np.ndarray,
-) -> Tuple[Dict[float, Dict[str, float]], Dict[str, float]]:
+) -> Dict[str, float]:
+    """Run LOO 1-NN evaluation for a single metric (no ratio test).
+
+    Returns a dict with aggregated metrics (currently accuracy only).
+    """
     splits = loo_splits(len(paths))
 
     all_true: List[str] = []
-    all_nn_labels: List[str] = []
-    all_d1: List[np.ndarray] = []
-    all_d2: List[np.ndarray] = []
+    all_pred: List[str] = []
 
     for ref_idx, qry_idx in splits:
         X_ref = X[ref_idx]
         X_qry = X[qry_idx]
-        if normalize:
-            X_ref = l2_normalize(X_ref)
-            X_qry = l2_normalize(X_qry)
-        D = cdist(X_qry, X_ref, metric=SUPPORTED[metric_key])  # shape (1, n_ref) in LOO
-
-        # 1-NN labels
-        nn_idx = np.argmin(D, axis=1)
+        if metric_key == "cosine":
+            # Compute cosine similarity and select argmax
+            if normalize:
+                X_ref_n = l2_normalize(X_ref)
+                X_qry_n = l2_normalize(X_qry)
+            else:
+                # Normalize only for cosine computation (does not affect euclidean path)
+                X_ref_n = l2_normalize(X_ref)
+                X_qry_n = l2_normalize(X_qry)
+            S = np.dot(X_qry_n, X_ref_n.T)  # cosine similarity
+            nn_idx = np.argmax(S, axis=1)
+        else:
+            if normalize:
+                X_ref = l2_normalize(X_ref)
+                X_qry = l2_normalize(X_qry)
+            D = cdist(X_qry, X_ref, metric=SUPPORTED[metric_key])  # shape (1, n_ref) in LOO
+            # 1-NN prediction (min distance)
+            nn_idx = np.argmin(D, axis=1)
         y_ref = [labels[i] for i in ref_idx]
         y_qry = [labels[i] for i in qry_idx]
         nn_labels = [y_ref[j] for j in nn_idx]
 
-        d1, d2 = top2_distances(D)
+        all_true.extend(y_qry)
+        all_pred.extend(nn_labels)
+
+    total = len(all_true)
+    correct = sum(1 for i in range(total) if all_true[i] == all_pred[i])
+    accuracy = correct / (total + 1e-12)
+    return {"accuracy": float(accuracy)}
+
+
+def collect_ratio_data(
+    X: np.ndarray,
+    paths: Sequence[str],
+    labels: Sequence[str],
+    metric_key: str,
+    normalize: bool,
+) -> Tuple[List[str], List[str], np.ndarray, np.ndarray]:
+    """Collect y_true, 1-NN labels, and top-2 distances (d1, d2) across LOO splits."""
+    splits = loo_splits(len(paths))
+    all_true: List[str] = []
+    all_nn_labels: List[str] = []
+    d1_list: List[float] = []
+    d2_list: List[float] = []
+
+    for ref_idx, qry_idx in splits:
+        X_ref = X[ref_idx]
+        X_qry = X[qry_idx]
+        if metric_key == "cosine":
+            # Cosine similarity for NN; convert to distances for ratio extraction
+            if normalize:
+                X_ref_n = l2_normalize(X_ref)
+                X_qry_n = l2_normalize(X_qry)
+            else:
+                X_ref_n = l2_normalize(X_ref)
+                X_qry_n = l2_normalize(X_qry)
+            S = np.dot(X_qry_n, X_ref_n.T)  # (1, n_ref)
+            D = 1.0 - S  # cosine distance derived from similarity, only for ratio d1/d2
+            # top-2 distances
+            d1, d2 = top2_distances(D)
+            d1_list.extend(d1.tolist())
+            d2_list.extend(d2.tolist())
+            # 1-NN labels from maximum similarity
+            nn_idx = np.argmax(S, axis=1)
+        else:
+            if normalize:
+                X_ref = l2_normalize(X_ref)
+                X_qry = l2_normalize(X_qry)
+            D = cdist(X_qry, X_ref, metric=SUPPORTED[metric_key])  # (1, n_ref)
+            # top-2 distances
+            d1, d2 = top2_distances(D)
+            d1_list.extend(d1.tolist())
+            d2_list.extend(d2.tolist())
+            # 1-NN labels (min distance)
+            nn_idx = np.argmin(D, axis=1)
+        y_ref = [labels[i] for i in ref_idx]
+        y_qry = [labels[i] for i in qry_idx]
+        nn_labels = [y_ref[j] for j in nn_idx]
 
         all_true.extend(y_qry)
         all_nn_labels.extend(nn_labels)
-        all_d1.append(d1)
-        all_d2.append(d2)
 
-    all_d1_arr = np.concatenate(all_d1, axis=0)
-    all_d2_arr = np.concatenate(all_d2, axis=0)
-
-    results = evaluate_ratio_test(all_true, all_nn_labels, all_d1_arr, all_d2_arr, ratios)
-    # Best by F1
-    best_ratio, best_metrics = max(results.items(), key=lambda kv: kv[1]["f1"])  # type: ignore[index]
-    best = {**best_metrics, "best_ratio": float(best_ratio)}
-    return results, best
+    return all_true, all_nn_labels, np.asarray(d1_list, dtype=np.float32), np.asarray(d2_list, dtype=np.float32)
 
 
 def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
-    p = argparse.ArgumentParser(description="Sperimenta metriche + 2-NN ratio test su embeddings (MobileNetV2)")
+    p = argparse.ArgumentParser(description="Confronto metriche di distanza su embeddings (LOO 1-NN, senza ratio)")
     p.add_argument("--embeddings", default=DEFAULT_EMBEDDINGS_PATH, help="Percorso a embeddings .npy (default: ../data/embeddings/embeddings_mobilenet_v2.npy)")
     p.add_argument("--label_mode", choices=["dirname", "filename_prefix"], default="dirname", help="Come derivare le etichette dai path")
-    p.add_argument("--metrics", default="cosine,euclidean,manhattan", help="Metriche da testare separate da virgola")
+    p.add_argument("--metrics", default="cosine,euclidean", help="Metriche da testare separate da virgola")
     p.add_argument("--normalize", action="store_true", help="Applica L2-normalizzazione ai vettori prima della distanza")
-    # Preferred 'ratio' arguments
-    p.add_argument("--ratio_min", type=float, default=None, help="Soglia minima per il ratio d1/d2 (default: 0.6)")
-    p.add_argument("--ratio_max", type=float, default=None, help="Soglia massima per il ratio d1/d2 (default: 0.95)")
-    p.add_argument("--ratio_steps", type=int, default=None, help="Numero di passi per il ratio (default: 20)")
-    # Deprecated tau arguments for backward compatibility
-    p.add_argument("--tau_min", type=float, default=0.6, help="[DEPRECATO] Usa --ratio_min")
-    p.add_argument("--tau_max", type=float, default=0.95, help="[DEPRECATO] Usa --ratio_max")
-    p.add_argument("--tau_steps", type=int, default=20, help="[DEPRECATO] Usa --ratio_steps")
     p.add_argument("--out_dir", default="../experiments_out", help="Cartella di output: verranno create le sottocartelle 'plots/' (grafici) e 'csv_files/' (CSV)")
     return p.parse_args(argv)
 
@@ -240,17 +327,11 @@ def main(argv: Sequence[str] | None = None) -> int:
         print(f"[ERRORE] {e}", file=sys.stderr)
         return 2
 
-    if X.shape[0] < 3:
-        print("[ERRORE] Servono almeno 3 embeddings per eseguire il ratio test con LOO (ogni query deve avere almeno 2 riferimenti).", file=sys.stderr)
+    if X.shape[0] < 2:
+        print("[ERRORE] Servono almeno 2 embeddings per eseguire LOO 1-NN (almeno 1 riferimento per query).", file=sys.stderr)
         return 2
 
     labels = derive_labels(paths, mode=args.label_mode)
-
-    # Determine ratio grid (prefer new --ratio_* if provided)
-    ratio_min = args.ratio_min if args.ratio_min is not None else args.tau_min
-    ratio_max = args.ratio_max if args.ratio_max is not None else args.tau_max
-    ratio_steps = args.ratio_steps if args.ratio_steps is not None else args.tau_steps
-    ratios = np.linspace(float(ratio_min), float(ratio_max), int(ratio_steps), dtype=np.float32)
 
     metrics = [m.strip().lower() for m in (args.metrics or "").split(",") if m.strip()]
     if not metrics:
@@ -258,58 +339,71 @@ def main(argv: Sequence[str] | None = None) -> int:
         return 2
 
     os.makedirs(os.path.abspath(args.out_dir), exist_ok=True)
-    # Define subdirectories for plots and CSV files
     plots_dir = os.path.join(args.out_dir, "plots")
     csv_dir = os.path.join(args.out_dir, "csv_files")
     os.makedirs(os.path.abspath(plots_dir), exist_ok=True)
     os.makedirs(os.path.abspath(csv_dir), exist_ok=True)
 
-    summary: List[Tuple[str, float, Dict[str, float]]] = []
+    # Esegui sia SENZA normalizzazione che CON normalizzazione, producendo due grafici separati
+    normalize_variants = [False, True]
 
-    for m in metrics:
-        if m not in SUPPORTED:
-            print(f"[WARN] metrica '{m}' non supportata, salto.", file=sys.stderr)
-            continue
-        print(f"[INFO] Eseguo metrica={m} | normalize={args.normalize}")
-        results, best = run_metric(X, paths, labels, metric_key=m, normalize=bool(args.normalize), ratios=ratios)
+    for norm in normalize_variants:
+        variant_name = "normalized" if norm else "unnormalized"
+        print(f"\n===== VALUTAZIONE ({variant_name.upper()}) =====")
 
-        # Salva curva
-        plot_path = os.path.join(plots_dir, f"curve_{m}.png")
-        plot_curve(ratios, results, plot_path, title=f"Ratio test curve - {m}")
-        print(f"[OK] Salvato grafico: {plot_path}")
+        accuracies: Dict[str, float] = {}
+        for m in metrics:
+            if m not in SUPPORTED:
+                print(f"[WARN] metrica '{m}' non supportata, salto.", file=sys.stderr)
+                continue
+            print(f"[INFO] Eseguo metrica={m} | normalize={norm}")
+            metr = run_metric(X, paths, labels, metric_key=m, normalize=norm)
+            acc = float(metr.get("accuracy", 0.0))
+            accuracies[m] = acc
+            print(f"[OK] {m}: accuracy={acc:.4f}")
 
-        # Salva CSV risultati completi per metrica
-        results_csv = os.path.join(csv_dir, f"results_{m}.csv")
-        save_results_csv(results, results_csv)
-        print(f"[OK] Salvato CSV risultati: {results_csv}")
+            # Calcola curve Precision/Recall/F1/Coverage vs tau (ratio test)
+            if len(paths) >= 3:
+                y_true, nn_labels, d1, d2 = collect_ratio_data(X, paths, labels, metric_key=m, normalize=norm)
+                ratios = np.linspace(0.5, 1, 46, dtype=np.float32)
+                results = evaluate_ratio_test(y_true, nn_labels, d1, d2, ratios)
+                # Trova best tau per F1
+                order = sorted(results.keys())
+                f1_vals = [results[t]["f1"] for t in order]
+                best_idx = int(np.argmax(f1_vals)) if len(f1_vals) > 0 else None
+                best_tau = order[best_idx] if best_idx is not None else None
+                best_f1 = f1_vals[best_idx] if best_idx is not None else None
+                # Salva plot curva
+                curve_png = os.path.join(plots_dir, f"curve_{m}_{variant_name}.png")
+                curve_title = f"Curve PR/F1/Coverage vs ratio - {m} ({'norm' if norm else 'no-norm'})"
+                plot_curve(order, results, curve_png, curve_title)
+                if best_tau is not None and best_f1 is not None:
+                    print(f"[OK] {m}: best tau={best_tau:.3f} con F1={best_f1:.4f} | curva: {curve_png}")
+                else:
+                    print(f"[WARN] {m}: non è stato possibile determinare il best tau | curva: {curve_png}")
+            else:
+                print(f"[WARN] {m}: dataset troppo piccolo per ratio test (servono >=3 esempi totali). Salto la curva.")
 
-        print(
-            f"[BEST] metric={m} best_ratio={best['best_ratio']:.3f} F1={best['f1']:.3f} "
-            f"P={best['precision']:.3f} R={best['recall']:.3f} Acc={best['accuracy']:.3f} Cov={best['coverage']:.3f}"
-        )
-        summary.append((m, float(best["best_ratio"]), best))
+        if accuracies:
+            # Salva CSV riepilogo per variante
+            summary_csv = os.path.join(csv_dir, f"metrics_summary_{variant_name}.csv")
+            save_metrics_summary_csv(accuracies, summary_csv)
+            print(f"[OK] Salvato CSV riepilogo: {summary_csv}")
 
-    # Salva riepilogo migliori per metrica
-    if summary:
-        best_csv = os.path.join(csv_dir, "best_summary.csv")
-        with open(best_csv, "w", encoding="utf-8") as f:
-            f.write("metric,best_ratio,precision,recall,f1,accuracy,coverage\n")
-            for m, ratio, metr in summary:
-                f.write(
-                    f"{m},{ratio:.6f},{metr['precision']:.6f},{metr['recall']:.6f},{metr['f1']:.6f},{metr['accuracy']:.6f},{metr['coverage']:.6f}\n"
-                )
-        print(f"[OK] Salvato best_summary: {best_csv}")
+            # Salva grafico a barre per variante
+            plot_path = os.path.join(plots_dir, f"metrics_accuracy_{variant_name}.png")
+            names = list(accuracies.keys())
+            scores = [accuracies[n] for n in names]
+            title_suffix = "con normalizzazione" if norm else "senza normalizzazione"
+            plot_metrics_bar(names, scores, plot_path, title=f"Accuracy per metrica (1-NN LOO) - {title_suffix}")
+            print(f"[OK] Salvato grafico: {plot_path}")
 
-    print("\n=== RIEPILOGO ===")
-    if summary:
-        best_global = max(summary, key=lambda t: t[2]["f1"])  # type: ignore[index]
-        m, ratio, metr = best_global
-        print(
-            f"Metrica migliore: {m} | ratio={ratio:.3f} | F1={metr['f1']:.3f} "
-            f"P={metr['precision']:.3f} R={metr['recall']:.3f} Acc={metr['accuracy']:.3f} Cov={metr['coverage']:.3f}"
-        )
-    else:
-        print("Nessun risultato (metrica non valida o problemi negli input)")
+            # Best metric per variante
+            best_name = max(accuracies.items(), key=lambda kv: kv[1])[0]
+            print("\n=== RIEPILOGO VARIANTE ===")
+            print(f"Metrica migliore ({variant_name}): {best_name} | accuracy={accuracies[best_name]:.3f}")
+        else:
+            print(f"Nessun risultato per la variante {variant_name} (metrica non valida o problemi negli input)")
 
     return 0
 

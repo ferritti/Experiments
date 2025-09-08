@@ -1,3 +1,98 @@
+../data/crops/quadri/Antonio Donghi - Piazzale alberato/IMG_5911_crop.png
+../data/crops/quadri/Antonio Donghi - Piazzale alberato/IMG_5912_crop.png
+../data/crops/quadri/Antonio Donghi - Piazzale alberato/IMG_5913_crop.png
+../data/crops/quadri/Arturo Martini - Risveglio/IMG_5719_crop.png
+../data/crops/quadri/Arturo Martini - Risveglio/IMG_5720_crop.png
+../data/crops/quadri/Bruno Cassinari - Paesaggio/IMG_5891_crop.png
+../data/crops/quadri/Bruno Cassinari - Paesaggio/IMG_5892_crop.png
+../data/crops/quadri/Bruno Cassinari - Paesaggio/IMG_5893_crop.png
+../data/crops/quadri/Carlo Carrà - Riviera/IMG_5875_crop.png
+../data/crops/quadri/Carlo Carrà - Riviera/IMG_5876_crop.png
+../data/crops/quadri/Carlo Carrà - Riviera/IMG_5877_crop.png
+../data/crops/quadri/Carlo Levi - Giovane donna/IMG_5783_crop.png
+../data/crops/quadri/Carlo Levi - Giovane donna/IMG_5784_crop.png
+../data/crops/quadri/Carlo Levi - Giovane donna/IMG_5785_crop.png
+../data/crops/quadri/Ennio Morlotti - Fiori/IMG_5806_crop.png
+../data/crops/quadri/Ennio Morlotti - Fiori/IMG_5807_crop.png
+../data/crops/quadri/Ennio Morlotti - Fiori/IMG_5808_crop.png
+../data/crops/quadri/Felice Casorati - Nuda (studio per il meriggio)/IMG_5735_crop.png
+../data/crops/quadri/Felice Casorati - Nuda (studio per il meriggio)/IMG_5736_crop.png
+../data/crops/quadri/Felice Casorati - Nudo giallo/IMG_5814_crop.png
+../data/crops/quadri/Felice Casorati - Nudo giallo/IMG_5815_crop.png
+../data/crops/quadri/Felice Casorati - Nudo giallo/IMG_5816_crop.png
+../data/crops/quadri/Filippo De Pisis - Funghi con stampa di Poussin/IMG_5802_crop.png
+../data/crops/quadri/Filippo De Pisis - Funghi con stampa di Poussin/IMG_5803_crop.png
+../data/crops/quadri/Filippo De Pisis - Funghi con stampa di Poussin/IMG_5804_crop.png
+../data/crops/quadri/Filippo De Pisis - Tele e pennelli/IMG_5810_crop.png
+../data/crops/quadri/Filippo De Pisis - Tele e pennelli/IMG_5811_crop.png
+../data/crops/quadri/Filippo De Pisis - Tele e pennelli/IMG_5812_crop.png
+../data/crops/quadri/Filippo de Pisis - Veduta di Cannes/IMG_5903_crop.png
+../data/crops/quadri/Filippo de Pisis - Veduta di Cannes/IMG_5904_crop.png
+../data/crops/quadri/Filippo de Pisis - Veduta di Cannes/IMG_5905_crop.png
+../data/crops/quadri/Fortunato Depero - Nitrito in velocità/IMG_5822_crop.png
+../data/crops/quadri/Fortunato Depero - Nitrito in velocità/IMG_5823_crop.png
+../data/crops/quadri/Fortunato Depero - Nitrito in velocità/IMG_5824_crop.png
+../data/crops/quadri/Gino Bonichi - Testa del cardinale/IMG_5792_crop.png
+../data/crops/quadri/Gino Bonichi - Testa del cardinale/IMG_5793_crop.png
+../data/crops/quadri/Gino Bonichi - Testa del cardinale/IMG_5794_crop.png
+../data/crops/quadri/Gino Severini - La finestra coi colombi/IMG_5702_crop.png
+../data/crops/quadri/Gino Severini - La finestra coi colombi/IMG_5703_crop.png
+../data/crops/quadri/Giorgio De Chirico - Les bains mystèrieux/IMG_5699_crop.png
+../data/crops/quadri/Giorgio De Chirico - Les bains mystèrieux/IMG_5700_crop.png
+../data/crops/quadri/Giorgio Morandi - Natura morta/IMG_5871_crop.png
+../data/crops/quadri/Giorgio Morandi - Natura morta/IMG_5872_crop.png
+../data/crops/quadri/Giorgio Morandi - Natura morta/IMG_5873_crop.png
+../data/crops/quadri/Giorgio Morandi - Paesaggio/IMG_5895_crop.png
+../data/crops/quadri/Giorgio Morandi - Paesaggio/IMG_5896_crop.png
+../data/crops/quadri/Giorgio Morandi - Paesaggio/IMG_5897_crop.png
+../data/crops/quadri/Giuseppe Migneco - Ragazza di schiena/IMG_5722_crop.png
+../data/crops/quadri/Giuseppe Migneco - Ragazza di schiena/IMG_5723_crop.png
+../data/crops/quadri/Giuseppe Santomaso - Donne sedute/Donne sedute_1_crop.png
+../data/crops/quadri/Giuseppe Santomaso - Donne sedute/Donne sedute_2_crop.png
+../data/crops/quadri/Giuseppe Santomaso - Donne sedute/Donne sedute_3_crop.png
+../data/crops/quadri/Giuseppe Viviani - Alabastrino sul mare/Albastrino sul mare_1_crop.png
+../data/crops/quadri/Giuseppe Viviani - Alabastrino sul mare/Albastrino sul mare_2_crop.png
+../data/crops/quadri/Giuseppe Viviani - Alabastrino sul mare/Albastrino sul mare_3_crop.png
+../data/crops/quadri/Marino Marini - Nudo/IMG_5726_crop.png
+../data/crops/quadri/Marino Marini - Nudo/IMG_5727_crop.png
+../data/crops/quadri/Marino Marini - Nudo/IMG_5728_crop.png
+../data/crops/quadri/Mario Sironi - Lago di montagna/IMG_5907_crop.png
+../data/crops/quadri/Mario Sironi - Lago di montagna/IMG_5908_crop.png
+../data/crops/quadri/Mario Sironi - Lago di montagna/IMG_5909_crop.png
+../data/crops/quadri/Mario Sironi - Paesaggio dolomitico/IMG_5899_crop.png
+../data/crops/quadri/Mario Sironi - Paesaggio dolomitico/IMG_5900_crop.png
+../data/crops/quadri/Mario Sironi - Paesaggio dolomitico/IMG_5901_crop.png
+../data/crops/quadri/Mario Sironi - Pittore al cavalletto/IMG_5818_crop.png
+../data/crops/quadri/Mario Sironi - Pittore al cavalletto/IMG_5819_crop.png
+../data/crops/quadri/Mario Sironi - Pittore al cavalletto/IMG_5820_crop.png
+../data/crops/quadri/Massimo Campigli - Testa di donna/IMG_5796_crop.png
+../data/crops/quadri/Massimo Campigli - Testa di donna/IMG_5797_crop.png
+../data/crops/quadri/Massimo Campigli - Testa di donna/IMG_5798_crop.png
+../data/crops/quadri/Ottone Rosai - Crepuscolo/IMG_5883_crop.png
+../data/crops/quadri/Ottone Rosai - Crepuscolo/IMG_5884_crop.png
+../data/crops/quadri/Ottone Rosai - Crepuscolo/IMG_5885_crop.png
+../data/crops/quadri/Pompero Borra - Ritratto di Maruzza/IMG_5779_crop.png
+../data/crops/quadri/Pompero Borra - Ritratto di Maruzza/IMG_5780_crop.png
+../data/crops/quadri/Pompero Borra - Ritratto di Maruzza/IMG_5781_crop.png
+../data/crops/quadri/Renato Birolli - La cava sotto il monte/IMG_5887_crop.png
+../data/crops/quadri/Renato Birolli - La cava sotto il monte/IMG_5888_crop.png
+../data/crops/quadri/Renato Birolli - La cava sotto il monte/IMG_5889_crop.png
+../data/crops/quadri/Renato Paresce - La donna alla finestra (1931)/IMG_5706_crop.png
+../data/crops/quadri/Renato Paresce - La donna alla finestra (1931)/IMG_5707_crop.png
+../data/crops/quadri/Renato Paresce - La donna alla finestra (1931)/IMG_5708_crop.png
+../data/crops/quadri/Renato Paresce - Natura morta con vaso/IMG_5710_crop.png
+../data/crops/quadri/Renato Paresce - Natura morta con vaso/IMG_5712_crop.png
+../data/crops/quadri/Roberto Melli - Risveglio estivo/IMG_5775_crop.png
+../data/crops/quadri/Roberto Melli - Risveglio estivo/IMG_5776_crop.png
+../data/crops/quadri/Roberto Melli - Risveglio estivo/IMG_5777_crop.png
+../data/crops/quadri/Virgilio Guidi - Donna in bleu/IMG_5752_crop.png
+../data/crops/quadri/Virgilio Guidi - Donna in bleu/IMG_5753_crop.png
+../data/crops/quadri/Virgilio Guidi - Donna solitaria/IMG_5767_crop.png
+../data/crops/quadri/Virgilio Guidi - Donna solitaria/IMG_5768_crop.png
+../data/crops/quadri/Virgilio Guidi - Donna solitaria/IMG_5769_crop.png
+../data/crops/quadri/Virglilio Guidi, Essenzialità del mare (1951 ca)/IMG_5879_crop.png
+../data/crops/quadri/Virglilio Guidi, Essenzialità del mare (1951 ca)/IMG_5880_crop.png
+../data/crops/quadri/Virglilio Guidi, Essenzialità del mare (1951 ca)/IMG_5881_crop.png
 ../data/crops/quadri/gioconda/gioconda_1_crop.png
 ../data/crops/quadri/gioconda/gioconda_2_crop.png
 ../data/crops/quadri/gioconda/gioconda_3_crop.png
@@ -25,6 +120,122 @@
 ../data/crops/quadri/the_persistence_of_memory/the_persistence_of_memory_1_crop.png
 ../data/crops/quadri/the_persistence_of_memory/the_persistence_of_memory_2_crop.png
 ../data/crops/quadri/the_persistence_of_memory/the_persistence_of_memory_3_crop.png
+../data/crops/statue/Amuleto raffigurante il dio Anubi/0013ZI_1120192310945F3E0F5C275997F3BB06_full_crop.png
+../data/crops/statue/Amuleto raffigurante il dio Anubi/0013ZI_37E0E438D1DB47CAC7F18BB2005C5C4E_full_crop.png
+../data/crops/statue/Amuleto raffigurante il dio Anubi/0013ZI_6DD8C927F850C3C7AEDFAF398DD378D7_full_crop.png
+../data/crops/statue/Amuleto raffigurante il dio Anubi/0013ZI_D2AC4336F3E5D2EB14CA965798CE409F_full_crop.png
+../data/crops/statue/Amuleto raffigurante il dio Anubi/0013ZI_FED58BCC84313E40FA1B7DE297D582DF_full_crop.png
+../data/crops/statue/Amuleto raffigurante il dio Khonsu/00167W_66575ADA4F889F197EF6FA04024719BC_full_crop.png
+../data/crops/statue/Amuleto raffigurante il dio Khonsu/00167W_6711716AFC06E9AC925906D471832E8A_full_crop.png
+../data/crops/statue/Amuleto raffigurante il dio Khonsu/00167W_99EE36F26E35D34EA4709893C8106780_full_crop.png
+../data/crops/statue/Amuleto raffigurante il dio Khonsu/00167W_D164D552E0F9270D70E1B06917EDA6DD_full_crop.png
+../data/crops/statue/Amuleto raffigurante il dio Ptah/00167V_40764FE407889C759D5812791FA20900_full_crop.png
+../data/crops/statue/Amuleto raffigurante il dio Ptah/00167V_64E8233D3D6D767960025FE31C6A4B3E_full_crop.png
+../data/crops/statue/Amuleto raffigurante il dio Ptah/00167V_98418429F1A12807E2FCE244D1B1E6C3_full_crop.png
+../data/crops/statue/Amuleto raffigurante il dio Ptah/00167V_F6613B919F6A5D1420FEBA50F669FE63_full_crop.png
+../data/crops/statue/Amuleto raffigurante il dio Thot/001TDN_3CA331665BD480694F233FD26065C188_full_crop.png
+../data/crops/statue/Amuleto raffigurante il dio Thot/001TDN_5C29676AE7C812196B226BD79D347965_full_crop.png
+../data/crops/statue/Amuleto raffigurante il dio Thot/001TDN_A5D15194159A5E013D244AD990318D7D_full_crop.png
+../data/crops/statue/Amuleto raffigurante il dio Thot/001TDN_B33AA925F1447553D2613A6C39BE54F3_full_crop.png
+../data/crops/statue/Amuleto raffigurante la dea Iside (?)/001T74_023A2258A24032680ECA1D7B5FC695EF_full_crop.png
+../data/crops/statue/Amuleto raffigurante la dea Iside (?)/001T74_0CB90FFCD249FA76EE9D8D95527D6286_full_crop.png
+../data/crops/statue/Amuleto raffigurante la dea Iside (?)/001T74_32AF13F82DB5E783C08FB0D2B711B85F_full_crop.png
+../data/crops/statue/Amuleto raffigurante la dea Iside (?)/001T74_6BD85C0898F58CDAE3D1D089D652F346_full_crop.png
+../data/crops/statue/Amuleto raffigurante la dea Iside (?)/001T74_7A143D66BE3716C18C92ECD0EDB92377_full_crop.png
+../data/crops/statue/Amuleto raffigurante la dea Nefti 2/0016GE_317E7BAB773D301F4A724013A078713F_full_crop.png
+../data/crops/statue/Amuleto raffigurante la dea Nefti 2/0016GE_A17BC536C081023EA54C3D0C4F7B93E1_full_crop.png
+../data/crops/statue/Amuleto raffigurante la dea Nefti 2/0016GE_B65BF065DA8247924103DFF3FC7E251C_full_crop.png
+../data/crops/statue/Amuleto raffigurante la dea Nefti 2/0016GE_BB5E3877EFADA070EAFA4B6F9E6E68EC_full_crop.png
+../data/crops/statue/Amuleto raffigurante la dea Nefti/0016CT_3C8D133F629AF98A12401173D3F028ED_full_crop.png
+../data/crops/statue/Amuleto raffigurante la dea Nefti/0016CT_524C7A6DA9EACF4121C4C6FB9F88776D_full_crop.png
+../data/crops/statue/Amuleto raffigurante la dea Nefti/0016CT_B18E06F2C3BC43950C373B9A2C450D5D_full_crop.png
+../data/crops/statue/Amuleto raffigurante la dea Nefti/0016CT_E0D45AB74977D59DAF69649FEA7D1FE6_full_crop.png
+../data/crops/statue/Amuleto raffigurante la dea Sekhmet o Bastet/001T97_1A89C8D0DA5BB51E3C58F56861254717_full_crop.png
+../data/crops/statue/Amuleto raffigurante la dea Sekhmet o Bastet/001T97_7CBE7760737ED9423AFFB2803882B532_full_crop.png
+../data/crops/statue/Amuleto raffigurante la dea Sekhmet o Bastet/001T97_8D9D2EE3F2C3054864ADA16CDCB1E297_full_crop.png
+../data/crops/statue/Amuleto raffigurante la dea Sekhmet o Bastet/001T97_985F79527DA53C36BFF824BED6CFD887_full_crop.png
+../data/crops/statue/Amuleto raffigurante la dea Sekhmet/001T7U_06EB485486915992953483FD0FD6903A_full_crop.png
+../data/crops/statue/Amuleto raffigurante la dea Sekhmet/001T7U_1B528DD9BB590D611B69CD48C6775CD6_full_crop.png
+../data/crops/statue/Amuleto raffigurante la dea Sekhmet/001T7U_84CE9E03C5F7C0618ED3850BD640136D_full_crop.png
+../data/crops/statue/Amuleto raffigurante la dea Sekhmet/001T7U_AA7B004C713EF0BDEC212710F0550872_full_crop.png
+../data/crops/statue/Amuleto raffigurante la dea Sekhmet/001T7U_BCF8313C49FE804D5C578ECA420A9098_full_crop.png
+../data/crops/statue/Antoniette Raphael De Simon - Ritratto di Emilio Jesi/IMG_5760_crop.png
+../data/crops/statue/Antoniette Raphael De Simon - Ritratto di Emilio Jesi/IMG_5937_crop.png
+../data/crops/statue/Antoniette Raphael De Simon - Ritratto di Emilio Jesi/IMG_5938_crop.png
+../data/crops/statue/Antoniette Raphael De Simon - Ritratto di Emilio Jesi/IMG_5939_crop.png
+../data/crops/statue/Antoniette Raphael De Simon - Ritratto di Emilio Jesi/Ritratto_di_Emilio_Jesi_1_crop.png
+../data/crops/statue/Arturo Martini - L'attesa o Susanna/L'attesa o susanna_1_crop.png
+../data/crops/statue/Arturo Martini - L'attesa o Susanna/L'attesa o susanna_2_crop.png
+../data/crops/statue/Arturo Martini - L'attesa o Susanna/L'attesa o susanna_3_crop.png
+../data/crops/statue/Arturo Martini - L'attesa o Susanna/L'attesa o susanna_4_crop.png
+../data/crops/statue/Arturo Martini - La Pisana/IMG_5738_crop.png
+../data/crops/statue/Arturo Martini - La Pisana/La_Pisana_1_crop.png
+../data/crops/statue/Arturo Martini - La cinese/IMG_5763_crop.png
+../data/crops/statue/Arturo Martini - La cinese/IMG_5764_crop.png
+../data/crops/statue/Arturo Martini - La cinese/IMG_5765_crop.png
+../data/crops/statue/Arturo Martini - La cinese/La_cinese_1_crop.png
+../data/crops/statue/Arturo Martini - Leone di Monterosso/IMG_5915_crop.png
+../data/crops/statue/Arturo Martini - Leone di Monterosso/IMG_5916_crop.png
+../data/crops/statue/Arturo Martini - Leone di Monterosso/IMG_5917_crop.png
+../data/crops/statue/Arturo Martini - Leone di Monterosso/IMG_5918_crop.png
+../data/crops/statue/Giacomo Manzoni - Testa di giovane/IMG_5747_crop.png
+../data/crops/statue/Giacomo Manzoni - Testa di giovane/IMG_5749_crop.png
+../data/crops/statue/Giacomo Manzoni - Testa di giovane/Testa_di_giovane_1_crop.png
+../data/crops/statue/Iside piangente/0016B3_892FEF5279CF1F9A881D3867E046F9B0_full_crop.png
+../data/crops/statue/Iside piangente/0016B3_B56AFF16E7C6423ACEFE18C7E74CC5FB_full_crop.png
+../data/crops/statue/Iside piangente/0016B3_E9B1FF3CD3F68BFD17307D6D57F07051_full_crop.png
+../data/crops/statue/Iside piangente/0016B3_EB184E82A996EE1060CFF372955B32B2_full_crop.png
+../data/crops/statue/Lucio Fontana - Figura sdraiata/IMG_5787_crop.png
+../data/crops/statue/Lucio Fontana - Figura sdraiata/IMG_5788_crop.png
+../data/crops/statue/Lucio Fontana - Figura sdraiata/IMG_5789_crop.png
+../data/crops/statue/Lucio Fontana - Figura sdraiata/IMG_5790_crop.png
+../data/crops/statue/Lucio Fontana - Figura sdraiata/figura_sdraiata_1_crop.png
+../data/crops/statue/Lucio Fontana - Paulette/IMG_5771_crop.png
+../data/crops/statue/Lucio Fontana - Paulette/IMG_5772_crop.png
+../data/crops/statue/Lucio Fontana - Paulette/IMG_5773_crop.png
+../data/crops/statue/Lucio Fontana - Paulette/Paulette_1_crop.png
+../data/crops/statue/Marino Marini - Cavallo/Cavallo_1_crop.png
+../data/crops/statue/Marino Marini - Cavallo/IMG_5920_crop.png
+../data/crops/statue/Marino Marini - Cavallo/IMG_5921_crop.png
+../data/crops/statue/Marino Marini - Cavallo/IMG_5922_crop.png
+../data/crops/statue/Marino Marini - Cavallo/IMG_5923_crop.png
+../data/crops/statue/Marino Marini - Giovane pugile/Giovane pugile_1_crop.png
+../data/crops/statue/Marino Marini - Giovane pugile/Giovane pugile_2_crop.png
+../data/crops/statue/Marino Marini - Giovane pugile/Giovane pugile_3_crop.png
+../data/crops/statue/Marino Marini - Giovane pugile/Giovane pugile_4_crop.png
+../data/crops/statue/Marino Marini - Giovane pugile/Giovane_pugile_1_crop.png
+../data/crops/statue/Marino Marini - Ritratto di Lamberto Vitali/IMG_5755_crop.png
+../data/crops/statue/Marino Marini - Ritratto di Lamberto Vitali/IMG_5756_crop.png
+../data/crops/statue/Marino Marini - Ritratto di Lamberto Vitali/IMG_5757_crop.png
+../data/crops/statue/Marino Marini - Ritratto di Lamberto Vitali/Ritratto_di_Lamberto_Vitali_1_crop.png
+../data/crops/statue/Marino Marini - Testa di donna/IMG_5744_crop.png
+../data/crops/statue/Marino Marini - Testa di donna/IMG_5745_crop.png
+../data/crops/statue/Marino Marini - Testa di donna/Testa_di_donna_1_crop.png
+../data/crops/statue/Statua del dio Ptah (testa aggiunta nell’Ottocento)/0016UM_01CF295C0F5F233F404359D6AF06E956_full_crop.png
+../data/crops/statue/Statua del dio Ptah (testa aggiunta nell’Ottocento)/0016UM_47E93012889390F16BC60C0B3B289CAD_full_crop.png
+../data/crops/statue/Statua del dio Ptah (testa aggiunta nell’Ottocento)/0016UM_A4BC4D255CED0957E59D564040E848FA_full_crop.png
+../data/crops/statue/Statua del dio Ptah (testa aggiunta nell’Ottocento)/0016UM_E24A9CA0B53BDB4C6320C84E79D5C1C2_full_crop.png
+../data/crops/statue/Statua della dea Sekhmet/0016VU_51F3B78D049DC3E9F24DDE8FA929BF3C_full_crop.png
+../data/crops/statue/Statua della dea Sekhmet/0016VU_65C2CB01B781928B13B0CDBC4EE65A9C_full_crop.png
+../data/crops/statue/Statua della dea Sekhmet/0016VU_9CF3F4609273620AD6362FE26EC0964F_full_crop.png
+../data/crops/statue/Statuetta Osiride 2/00169Y_07FD51FF6D11219783CC082BBF0FC6B6_full_crop.png
+../data/crops/statue/Statuetta Osiride 2/00169Y_7DFCC22CC186984F22CD7414C1948865_full_crop.png
+../data/crops/statue/Statuetta Osiride 2/00169Y_8A79165BF4D72A80E579E01F35475F1F_full_crop.png
+../data/crops/statue/Statuetta Osiride 2/00169Y_ABD2CC2A171F262933D77A94C3C389AE_full_crop.png
+../data/crops/statue/Statuetta del dio Amon/00164V_1B6BE3D62A199E66E5A3CBD60CA1B425_full_crop.png
+../data/crops/statue/Statuetta del dio Amon/00164V_394CCC84E16E085647DD69E57A200BBD_full_crop.png
+../data/crops/statue/Statuetta del dio Amon/00164V_75D0B58FFB27E5F6094471837F817173_full_crop.png
+../data/crops/statue/Statuetta del dio Amon/00164V_89644D43529B3A456261CE5D54F4A611_full_crop.png
+../data/crops/statue/Statuetta del dio Amon/00164V_9E2B8073C4852AD7D8C0A2441F8F73ED_full_crop.png
+../data/crops/statue/Statuetta della dea Bastet/0016NH_415F39BB9A01B20A189A311FA19BDB09_full_crop.png
+../data/crops/statue/Statuetta della dea Bastet/0016NH_76A596F69BA17FEE13C59E4602664610_full_crop.png
+../data/crops/statue/Statuetta della dea Bastet/0016NH_C456674D53BCC033F3FD4B21C842D4EC_full_crop.png
+../data/crops/statue/Statuetta della dea Bastet/0016NH_ECF2C180EE087491E28F7FA898700FAD_full_crop.png
+../data/crops/statue/Statuetta di Iside che allatta Harpocrate/0016CJ_35C8B295C776F3C0D75AC7D2A472F8CE_full_crop.png
+../data/crops/statue/Statuetta di Iside che allatta Harpocrate/0016CJ_54F8819B9E2CD2BD1B0ADA4165A96E17_full_crop.png
+../data/crops/statue/Statuetta di Iside che allatta Harpocrate/0016CJ_7DE91B461CF6142ED5E8AEDE55CBFE1B_full_crop.png
+../data/crops/statue/Statuetta di Osiride/001R6V_9802D5E5D2F9565DA9EA8E29B9DA9C54_full_crop.png
+../data/crops/statue/Statuetta di Osiride/001R6V_C08CFA3B11D84B1970CCE7E0FCEA52AE_full_crop.png
 ../data/crops/statue/atena/atena_1_crop.png
 ../data/crops/statue/atena/atena_2_crop.png
 ../data/crops/statue/atena/atena_3_crop.png
@@ -49,6 +260,9 @@
 ../data/crops/statue/pietà/pietà_1_crop.png
 ../data/crops/statue/pietà/pietà_2_crop.png
 ../data/crops/statue/pietà/pietà_crop.png
+../data/crops/statue/statua_1/PHOTO-2025-09-02-20-24-46 2_crop.png
+../data/crops/statue/statua_1/PHOTO-2025-09-02-20-24-47 2_crop.png
+../data/crops/statue/statua_1/PHOTO-2025-09-02-20-24-47_crop.png
 ../data/crops/statue/venere_di_milo/venere_di_milo_1_crop.png
 ../data/crops/statue/venere_di_milo/venere_di_milo_2_crop.png
 ../data/crops/statue/venere_di_milo/venere_di_milo_3_crop.png
