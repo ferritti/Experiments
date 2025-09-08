@@ -1,0 +1,4 @@
+metric,accuracy
+cosine,0.884328
+euclidean,0.843284
+manhattan,0.839552
