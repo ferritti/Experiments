@@ -16,7 +16,7 @@ import matplotlib.pyplot as plt  # noqa: E402
 
 # Supported metrics mapping to scipy.spatial.distance.cdist names
 SUPPORTED = {
-    "cosine": "cosine",          # distance = 1 - cosine_similarity
+    "cosine": "cosine",         
     "euclidean": "euclidean",    # L2
 }
 
@@ -94,6 +94,60 @@ def top2_distances(D: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
     d1 = first_two[:, 0]
     d2 = first_two[:, 1]
     return d1, d2
+
+# ===== Helpers per esperimento Top-K =====
+from collections import Counter
+from typing import Dict as _Dict, List as _List
+
+def topk_indices_from_scores(S: np.ndarray, K: int, larger_is_better: bool) -> np.ndarray:
+    """Restituisce indici dei top-K per riga.
+    Se larger_is_better=True (es. similarità coseno), seleziona i K più grandi; altrimenti i K più piccoli.
+    Usa argpartition per efficienza; l'ordinamento all'interno dei K verrà raffinato a parte.
+    """
+    if K <= 0:
+        raise ValueError("K deve essere >= 1")
+    if S.shape[1] < K:
+        # Se K supera il riferimento, limita a tutto il set
+        K = S.shape[1]
+    if larger_is_better:
+        return np.argpartition(-S, K - 1, axis=1)[:, :K]
+    else:
+        return np.argpartition(S, K - 1, axis=1)[:, :K]
+
+
+def refine_sorted_topk(S: np.ndarray, topk_idx: np.ndarray, larger_is_better: bool) -> np.ndarray:
+    """Ordina correttamente i top-K selezionati per riga, mantenendo solo i K migliori in ordine."""
+    rows = np.arange(S.shape[0])[:, None]
+    vals = S[rows, topk_idx]
+    order_in_k = np.argsort(-vals if larger_is_better else vals, axis=1)
+    return topk_idx[rows, order_in_k]
+
+
+def majority_vote(labels_topk: _List[str], weights: _List[float] | None = None, prefer_max: bool = True) -> str:
+    """Voto di maggioranza sui top-K.
+    - Se weights è None: puro conteggio delle etichette; pareggio rotto alfabeticamente.
+    - Se weights è fornito: somma dei pesi per classe e scelta della classe con somma massima (prefer_max=True, tipico per similarità) o minima (prefer_max=False, tipico per distanze). In caso di pareggio, rottura alfabetica.
+    """
+    if weights is None:
+        counter = Counter(labels_topk)
+        max_count = max(counter.values())
+        tied = [c for c, v in counter.items() if v == max_count]
+        if len(tied) == 1:
+            return tied[0]
+        return sorted(tied)[0]
+    else:
+        groups: _Dict[str, float] = {}
+        for lbl, w in zip(labels_topk, weights):
+            groups[lbl] = groups.get(lbl, 0.0) + float(w)
+        if prefer_max:
+            best_val = max(groups.values())
+            tied = [c for c, v in groups.items() if v == best_val]
+        else:
+            best_val = min(groups.values())
+            tied = [c for c, v in groups.items() if v == best_val]
+        if len(tied) == 1:
+            return tied[0]
+        return sorted(tied)[0]
 
 
 def evaluate_ratio_test(
@@ -179,15 +233,15 @@ def save_results_csv(results: Dict[float, Dict[str, float]], out_csv: str) -> No
             )
 
 
-def plot_metrics_bar(metric_names: Sequence[str], scores: Sequence[float], out_png: str, title: str) -> None:
+def plot_metrics_bar(metric_names: Sequence[str], scores: Sequence[float], out_png: str, title: str, ylabel: str | None = None, bar_color: str | None = None) -> None:
     plt.figure(figsize=(7, 4))
     x = np.arange(len(metric_names))
-    plt.bar(x, scores, color="#69b3a2")
+    plt.bar(x, scores, color=(bar_color if bar_color is not None else "#69b3a2"))
     plt.xticks(x, metric_names)
     plt.ylim(0.0, 1.0)
     for xi, s in zip(x, scores):
         plt.text(xi, s + 0.01, f"{s:.3f}", ha="center", va="bottom", fontsize=9)
-    plt.ylabel("accuracy")
+    plt.ylabel(ylabel if ylabel is not None else "accuracy")
     plt.title(title)
     plt.grid(axis="y", alpha=0.3)
     plt.tight_layout()
@@ -202,6 +256,17 @@ def save_metrics_summary_csv(summary: Dict[str, float], out_csv: str) -> None:
         f.write("metric,accuracy\n")
         for m in summary:
             f.write(f"{m},{summary[m]:.6f}\n")
+
+
+def save_scores_csv(scores: Dict[str, float], out_csv: str, score_name: str) -> None:
+    """Salva un dizionario {metrica->valore} in CSV con header personalizzato.
+    Esempio: score_name="p_at_3" produrrà colonne: metric,p_at_3
+    """
+    os.makedirs(os.path.dirname(os.path.abspath(out_csv)), exist_ok=True)
+    with open(out_csv, "w", encoding="utf-8") as f:
+        f.write(f"metric,{score_name}\n")
+        for m, v in scores.items():
+            f.write(f"{m},{float(v):.6f}\n")
 
 
 def run_metric(
@@ -308,6 +373,72 @@ def collect_ratio_data(
     return all_true, all_nn_labels, np.asarray(d1_list, dtype=np.float32), np.asarray(d2_list, dtype=np.float32)
 
 
+def run_metric_topk(
+    X: np.ndarray,
+    paths: Sequence[str],
+    labels: Sequence[str],
+    metric_key: str,
+    normalize: bool,
+    K: int,
+) -> Dict[str, float]:
+    """Valuta P@K (classica) e Voting@K (accuracy) in LOO."""
+    splits = loo_splits(len(paths))
+
+    p_at_k_sum = 0.0
+    voting_correct = 0
+    total = 0
+
+    for ref_idx, qry_idx in splits:
+        X_ref = X[ref_idx]
+        X_qry = X[qry_idx]
+        y_ref = [labels[i] for i in ref_idx]
+        y_qry = [labels[i] for i in qry_idx]
+
+        if metric_key == "cosine":
+            # Similarità coseno: più alto è meglio
+            X_ref_n = l2_normalize(X_ref)
+            X_qry_n = l2_normalize(X_qry)
+            S = np.dot(X_qry_n, X_ref_n.T)  # shape (1, n_ref) in LOO
+            larger_is_better = True
+            tk_idx = topk_indices_from_scores(S, K, larger_is_better)
+            tk_idx = refine_sorted_topk(S, tk_idx, larger_is_better)
+            weights = S[0, tk_idx[0]].tolist()
+        else:
+            # Distanze: più basso è meglio
+            if normalize:
+                X_ref = l2_normalize(X_ref)
+                X_qry = l2_normalize(X_qry)
+            D = cdist(X_qry, X_ref, metric=SUPPORTED[metric_key])  # (1, n_ref)
+            larger_is_better = False
+            tk_idx = topk_indices_from_scores(D, K, larger_is_better)
+            tk_idx = refine_sorted_topk(D, tk_idx, larger_is_better)
+            weights = D[0, tk_idx[0]].tolist()
+
+        true_lbl = y_qry[0]
+        topk_labels = [y_ref[j] for j in tk_idx[0]]
+
+        rel = sum(1 for lbl in topk_labels if lbl == true_lbl)
+        p_at_k_sum += rel / max(1, min(K, len(y_ref)))
+
+        # Voting (tie-break dipende dal tipo di punteggio)
+        if metric_key == "cosine":
+            pred_vote = majority_vote(topk_labels, weights=weights, prefer_max=True)
+        else:
+            pred_vote = majority_vote(topk_labels, weights=weights, prefer_max=False)
+        if pred_vote == true_lbl:
+            voting_correct += 1
+
+        total += 1
+
+    denom = (total + 1e-12)
+    k_eff = min(K, len(paths) - 1)  # in LOO il ref ha n-1 elementi
+    return {
+        f"p_at_{K}": float(p_at_k_sum / denom),
+        f"voting_acc_at_{K}": float(voting_correct / denom),
+        "k_effective": float(k_eff),
+    }
+
+
 def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
     p = argparse.ArgumentParser(description="Confronto metriche di distanza su embeddings (LOO 1-NN, senza ratio)")
     p.add_argument("--embeddings", default=DEFAULT_EMBEDDINGS_PATH, help="Percorso a embeddings .npy (default: ../data/embeddings/embeddings_mobilenet_v2.npy)")
@@ -328,7 +459,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         return 2
 
     if X.shape[0] < 2:
-        print("[ERRORE] Servono almeno 2 embeddings per eseguire LOO 1-NN (almeno 1 riferimento per query).", file=sys.stderr)
+        print("[ERRORE] Servono almeno 2 embeddings per eseguire LOO 1-NN (almeno 1 riferimento per query).",
+              file=sys.stderr)
         return 2
 
     labels = derive_labels(paths, mode=args.label_mode)
@@ -352,6 +484,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         print(f"\n===== VALUTAZIONE ({variant_name.upper()}) =====")
 
         accuracies: Dict[str, float] = {}
+        p_at3: Dict[str, float] = {}
+        voting3: Dict[str, float] = {}
         for m in metrics:
             if m not in SUPPORTED:
                 print(f"[WARN] metrica '{m}' non supportata, salto.", file=sys.stderr)
@@ -361,6 +495,21 @@ def main(argv: Sequence[str] | None = None) -> int:
             acc = float(metr.get("accuracy", 0.0))
             accuracies[m] = acc
             print(f"[OK] {m}: accuracy={acc:.4f}")
+
+            # Esperimento Top-K (Precision@K, Voting@K) - SOLO COSINE e SOLO CON NORMALIZZAZIONE
+            if norm and m == "cosine":
+                K = 3
+                tk = run_metric_topk(X, paths, labels, metric_key=m, normalize=norm, K=K)
+                print(
+                    f"[INFO] {m} (norm): "
+                    f"Precision@{K}={tk[f'p_at_{K}']:.4f}, "
+                    f"Voting accuracy@{K}={tk[f'voting_acc_at_{K}']:.4f} (K_eff={int(tk['k_effective'])})"
+                )
+                p_at3[m] = float(tk[f'p_at_{K}'])
+                voting3[m] = float(tk[f'voting_acc_at_{K}'])
+            else:
+                # Non eseguire Precision@3 / Voting@3 per metriche diverse da cosine o senza normalizzazione
+                pass
 
             # Calcola curve Precision/Recall/F1/Coverage vs tau (ratio test)
             if len(paths) >= 3:
@@ -390,13 +539,35 @@ def main(argv: Sequence[str] | None = None) -> int:
             save_metrics_summary_csv(accuracies, summary_csv)
             print(f"[OK] Salvato CSV riepilogo: {summary_csv}")
 
-            # Salva grafico a barre per variante
-            plot_path = os.path.join(plots_dir, f"metrics_accuracy_{variant_name}.png")
+            # Salva grafico a barre per variante (accuracy 1-NN)
             names = list(accuracies.keys())
             scores = [accuracies[n] for n in names]
             title_suffix = "con normalizzazione" if norm else "senza normalizzazione"
-            plot_metrics_bar(names, scores, plot_path, title=f"Accuracy per metrica (1-NN LOO) - {title_suffix}")
-            print(f"[OK] Salvato grafico: {plot_path}")
+            plot_path_acc = os.path.join(plots_dir, f"metrics_accuracy_{variant_name}.png")
+            plot_metrics_bar(names, scores, plot_path_acc, title=f"Accuracy per metrica (1-NN LOO) - {title_suffix}",
+                             ylabel="Accuracy")
+            print(f"[OK] Salvato grafico: {plot_path_acc}")
+
+            # Salva grafici e CSV per Precision@3 e Voting accuracy@3 (solo metriche presenti nei rispettivi dizionari)
+            if p_at3:
+                # P@3 (solo cosine)
+                names_p = list(p_at3.keys())
+                scores_p = [p_at3[n] for n in names_p]
+                plot_path_p = os.path.join(plots_dir, f"metrics_p_at_3_{variant_name}.png")
+                plot_metrics_bar(names_p, scores_p, plot_path_p, title="Precision@3", ylabel="Precision@3",
+                                 bar_color="#4C78A8")
+                save_scores_csv(p_at3, os.path.join(csv_dir, f"metrics_p_at_3_{variant_name}.csv"), score_name="p_at_3")
+                print(f"[OK] Salvati P@3: grafico={plot_path_p}")
+
+                # Voting accuracy@3 (solo cosine)  <-- modificato titolo, ylabel, filename e nome campo CSV
+                names_v = list(voting3.keys())
+                scores_v = [voting3[n] for n in names_v]
+                plot_path_v = os.path.join(plots_dir, f"metrics_voting_accuracy_at_3_{variant_name}.png")
+                plot_metrics_bar(names_v, scores_v, plot_path_v, title="Voting accuracy@3", ylabel="Voting accuracy@3",
+                                 bar_color="#4C78A8")
+                save_scores_csv(voting3, os.path.join(csv_dir, f"metrics_voting_accuracy_at_3_{variant_name}.csv"),
+                                score_name="voting_accuracy_at_3")
+                print(f"[OK] Salvati Voting accuracy@3: grafico={plot_path_v}")
 
             # Best metric per variante
             best_name = max(accuracies.items(), key=lambda kv: kv[1])[0]
@@ -406,7 +577,6 @@ def main(argv: Sequence[str] | None = None) -> int:
             print(f"Nessun risultato per la variante {variant_name} (metrica non valida o problemi negli input)")
 
     return 0
-
 
 if __name__ == "__main__":  # pragma: no cover
     raise SystemExit(main())
