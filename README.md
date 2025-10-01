@@ -1,6 +1,6 @@
 # Experiments — Guida e descrizione dell’esperimento
 
-Questo progetto contiene uno script per generare embeddings di immagini (con MobileNetV2) e uno script per valutare, in maniera sistematica, diverse metriche di similarità tramite classificazione 1-NN in Leave-One-Out (LOO) e un “ratio test” in stile 2-NN di Lowe. Gli output includono CSV riepilogativi e grafici (bar plot delle accuracy e curve PR/Recall/F1/Coverage al variare della soglia del ratio test).
+Questo progetto contiene uno script per generare embeddings di immagini (con MobileNetV2) e uno script per valutare, in maniera sistematica, diverse metriche di similarità tramite classificazione 1-NN in Leave-One-Out (LOO) e un “ratio test” in stile 2-NN di Lowe. Gli output includono CSV riepilogativi e grafici (bar plot delle accuracy e curve PR/Recall/F1/Coverage al variare della soglia del ratio test), oltre a esperimenti Top‑K: Precision@K e Voting@K (attualmente K=3 su cosine normalizzato).
 
 In sintesi, l’esperimento misura quanto bene semplici regole di nearest neighbour riescano a riconoscere immagini dello stesso “autore/opera/classe” a partire da vettori di embedding estratti da una rete pre-addestrata.
 
@@ -97,8 +97,12 @@ Output prodotti in `experiments_out/`:
 - `plots/metrics_accuracy_unnormalized.png`
 - `plots/metrics_accuracy_normalized.png`
 - `plots/curve_{cosine,euclidean}_{unnormalized,normalized}.png` (se il dataset ha almeno 3 immagini totali)
+- `plots/metrics_p_at_3_normalized.png` (Precision@3, attualmente solo cosine normalizzato)
+- `plots/metrics_voting_accuracy_at_3_normalized.png` (Voting accuracy@3, attualmente solo cosine normalizzato)
 - `csv_files/metrics_summary_unnormalized.csv`
 - `csv_files/metrics_summary_normalized.csv`
+- `csv_files/metrics_p_at_3_normalized.csv`
+- `csv_files/metrics_voting_accuracy_at_3_normalized.csv`
 
 Log a console: per ogni metrica e variante, mostra l’accuracy e, per le curve del ratio test, il miglior `tau` (soglia su d1/d2) secondo F1.
 
@@ -118,6 +122,7 @@ Obiettivo: valutare la capacità di embeddings generici (MobileNetV2 pre‑addes
 In uscita, l’esperimento fornisce:
 - Accuracy di 1‑NN per ogni metrica e variante di normalizzazione.
 - Curve PR/Recall/F1/Coverage vs `tau` e il valore di `tau` che massimizza F1.
+- Esperimenti Top‑K: Precision@K (P@K) e Voting@K in LOO (attualmente K=3 su metrica cosine con normalizzazione L2).
 
 
 ## 6) Esempi pratici rapidi
@@ -150,7 +155,7 @@ Controlla `experiments_out/plots/` e `experiments_out/csv_files/` per i risultat
 
 - `src/`
   - `embed_crop.py`: genera embeddings e salva `.npy` + `.paths.txt`.
-  - `run_experiments.py`: valuta 1‑NN LOO e produce grafici/CSV, incluse le curve del ratio test.
+  - `run_experiments.py`: valuta 1‑NN LOO e produce grafici/CSV, incluse le curve del ratio test e gli esperimenti Top‑K (Precision@K, Voting@K).
 - `data/`
   - `crops/` (attesa per default da `embed_crop.py`)
   - `embeddings/` (uscita di `embed_crop.py`)
